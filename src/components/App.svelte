@@ -7,7 +7,7 @@
 
     let data = [];
     let value;
-    const steps = ["Study Time Analysis", "Average Grades with Respect to ", "Challenges & Insights"];
+    const steps = ["Study Hour and Academic Performance", 'Average Grades vs. Class Size', "Challenges & Insights"];
 
     onMount(async () => {
         data = await d3.csv('/capes_dsc_clean_v1.csv', d3.autoType);
@@ -29,13 +29,28 @@
         <div class="step" class:active={value === i}>
             <h3>{step}</h3>
             <div class="text-content">
-                {#if (step === 'Study Time Analysis')}
+                {#if (step === 'Study Hour and Academic Performance')}
                     <p>An in-depth look at how study time impacts grades.</p>
+                    <p class = "instruction"> Hover over points to see the course information of corresponding point.</p>
                     <Scatterplot></Scatterplot>
+                    <body>
+                        <p> From the Capes dataset, students tend to spend more time studying for lower division data science courses
+                            than those of upper division. Furthermore, lower division data science course tends 
+                            to be more difficult for most students. DSC30 and DSC80 tends to demand the most time from 
+                            students yet having the lowest average grades. 
+                        </p>
+                    </body>
                 {/if}
                 {#if (step === 'Average Grades vs. Class Size')}
                     <p>Visualizing the distribution of grades across various study times.</p>
+                    <p class = "instruction"> Hover over points to see the course information of corresponding point.</p>
                     <Bubbleplot></Bubbleplot>
+                    <body>
+                        <p> From the Capes dataset, DSC courses with bigger class sizes often have a lower 
+                            average grade. From this visualization, DSC20 and DSC30 seem to be weeder class within
+                            the data science catalog.
+                        </p>
+                    </body>
                 {/if}
                 {#if (step === 'Challenges & Insights')}
                     <p>Exploring the complexities of data interpretation in educational analytics.</p>
@@ -112,6 +127,10 @@
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden; /* Ensure no content spills out */
+    }
+
+    .instruction { 
+        color: purple;
     }
 
     .step h3 {

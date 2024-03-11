@@ -232,22 +232,9 @@
 
 </script>
 
-<style>
-    .flex-container {
-        height:  500;
-        width: 1000; 
-    }
-    .instruction { 
-        color: purple;
-    }
-</style>
 
 
-
-<div class = "flex-container"> 
-    <p class = "instruction"> Hover over points to see the course information of corresponding point.</p>
-    <div id="my_dataviz" style="position: relative;">
-        <div id="dropdownContainer" style="position: absolute; top: 0px; right: 20px;">
-        </div>
+<div id="my_dataviz" style="position: relative;">
+    <div id="dropdownContainer" style="position: absolute; top: 0px; right: 20px;">
     </div>
 </div>
