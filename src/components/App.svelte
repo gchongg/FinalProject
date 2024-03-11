@@ -50,13 +50,13 @@
 
 <style>
     /* Global Styles */
-    body {
+    /* .body {
         background-color: #fafafa;
         color: #333;
         font-family: 'Roboto', sans-serif;
         margin: 0;
         padding: 0;
-    }
+    } */
 
     /* Information Section */
     .info {
@@ -77,7 +77,7 @@
         color: #333;
     }
 
-    mark {
+    /* mark {
         background-color: #84fab0;
         color: #333;
         padding: 0.5em;
@@ -85,7 +85,7 @@
         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         display: inline-block;
         margin-top: 1em;
-    }
+    } */
 
     /* Section and Steps */
     section {
@@ -128,12 +128,6 @@
 
     .step.active {
         background-image: linear-gradient(to right, #fbc2eb 0%, #a6c1ee 100%);
-    }
-
-    .step svg { /* Targeting the SVG within the step */
-        display: block;
-        margin-top: 2rem; /* Space between text and graph */
-        z-index: 1; /* Below the text */
     }
 
     .step:hover {
