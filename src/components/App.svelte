@@ -3,7 +3,7 @@
     import { onMount } from 'svelte';
     import Scrolly from "./Scrolly.svelte";
     import Scatterplot from "./scatterplot.svelte";
-    import Bubbleplot from './Bubbleplot.svelte';
+    import Bubbleplot from './bubbleplot.svelte';
 
     let data = [];
     let value;
