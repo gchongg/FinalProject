@@ -2,7 +2,7 @@
     import * as d3 from 'd3';
     import { onMount } from 'svelte';
     import Scrolly from "./Scrolly.svelte";
-    import Scatterplot from "./Scatterplot.svelte";
+    import Scatterplot from "./scatterplot.svelte";
     import Bubbleplot from './Bubbleplot.svelte';
 
     let data = [];
