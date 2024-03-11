@@ -7,7 +7,7 @@
 
     let data = [];
     let value;
-    const steps = ["Study Time Analysis", "Grade Distribution", "Challenges & Insights"];
+    const steps = ["Study Time Analysis", "Average Grades with Respect to ", "Challenges & Insights"];
 
     onMount(async () => {
         data = await d3.csv('/capes_dsc_clean_v1.csv', d3.autoType);
@@ -33,7 +33,7 @@
                     <p>An in-depth look at how study time impacts grades.</p>
                     <Scatterplot></Scatterplot>
                 {/if}
-                {#if (step === 'Grade Distribution')}
+                {#if (step === 'Average Grades vs. Class Size')}
                     <p>Visualizing the distribution of grades across various study times.</p>
                     <Bubbleplot></Bubbleplot>
                 {/if}
