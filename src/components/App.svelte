@@ -4,10 +4,11 @@
     import Scrolly from "./Scrolly.svelte";
     import Scatterplot from "./scatterplot.svelte";
     import Bubbleplot from './bubbleplot.svelte';
+    import Calendar from './Calendar.svelte';
 
     let data = [];
     let value;
-    const steps = ["Study Hour and Academic Performance", 'Average Grades vs. Class Size', "Challenges & Insights"];
+    const steps = ["Study Hour and Academic Performance", 'Average Grades vs. Class Size', "Create Schedule"];
 
     onMount(async () => {
         data = await d3.csv('/capes_dsc_clean_v1.csv', d3.autoType);
@@ -22,8 +23,6 @@
 </div>
 
 <section>
-    <div class="spacer"></div>
-
     <Scrolly bind:value>
         {#each steps as step, i}
         <div class="step" class:active={value === i}>
@@ -52,8 +51,8 @@
                         </p>
                     </body>
                 {/if}
-                {#if (step === 'Challenges & Insights')}
-                    <p>Exploring the complexities of data interpretation in educational analytics.</p>
+                {#if (step === 'Create Schedule')}
+                    <Calendar></Calendar>
                 {/if}
             </div>
         </div>
