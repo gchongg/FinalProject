@@ -1,10 +1,12 @@
 <script>
-    import App from "../components/App.svelte";
+    // import App from "../components/App.svelte";
+    import Calendar from "../components/Calendar.svelte";
 </script>
 
-<App />
+<!-- <App /> -->
+<Calendar/> 
 
-<main> 
+<!-- <main> 
 <h1> Write Up </h1>
 
 <h3> What have you done so far?  </h3>
@@ -15,4 +17,4 @@
 
 <p> We believe that the most challenging task of our project is implementing the scrolling mechanism to ensure a smooth transition between different sections. Specifically, we need to connect the specific functions per visualization to avoid any overlap. 
   We will have annotations, labels, and interactive features for each visualization, but we want to make sure that our page layout doesn't cut off any important information or become too overwhelming for our audience. We're currently figuring out the best way to present everything (order of trends, and plot types for specific sections) so that our project can be delivered effectively. </p>
-</main>
+</main> -->

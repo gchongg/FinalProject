@@ -128,28 +128,149 @@
       return (hours * 60 + minutes) * (800/1440); // Assuming 60px height per hour, adjust if necessary
     }
   </script>
+  <style>
+    button {
+      background-color: #007bff; /* Green background */
+      color: white; /* White text */
+      padding: 12px 24px; /* Top and bottom padding, left and right padding */
+      border: none; /* No border */
+      border-radius: 4px; /* Rounded corners */
+      cursor: pointer; /* Hand cursor on hover */
+      font-size: 16px; /* Larger font size */
+      transition: background-color 0.3s; /* Smooth transition for hover effect */
+    }
+
+    button:hover {
+      background-color: #0056b3; /* Darker green background on hover */
+    }
+
+    /* Optional: focus state for accessibility */
+    button:focus {
+      outline: none; /* Removes the outline */
+      box-shadow: 0 0 0 2px rgba(76,175,80,0.5); /* Adds a green glow */
+    }
+
+    .event-form {
+    background-color: #f7f7f7;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: grid;
+    gap: 16px;
+    max-width: 400px;
+  }
   
+  .event-form input[type="text"], .event-form select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+  }
+
+  .event-form button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    }
+    
+    .event-form button:hover {
+      background-color: #0056b3;
+    }
+
+    .days-of-week {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .time-selectors {
+      display: flex;
+      gap: 10px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+    }
+
+    label {
+      margin-right: 8px;
+      font-size: 14px;
+    }
+    .grid-container {
+      display: grid; /* Establishes a grid container */
+      grid-template-columns: 3fr 1fr; /* Allocates 3 parts of the space for the calendar and 1 part for the dashboard */
+      column-gap: 20px; /* Optional: Specifies a gap between the columns */
+      height: 100vh; /* Adjust the height as needed */
+      /* Additional styling as needed */
+    }
+
+    #my-calendar {
+      /* Calendar-specific styles */
+      /* No need to set width, as it's controlled by grid-template-columns */
+      background-color: #eef; /* Example styling */
+      /* Adjust padding, margin, or other styles as needed */
+    }
+
+    .dashboard {
+      /* Dashboard-specific styles */
+      background-color: #ffe; /* Example styling */
+      overflow-y: auto; /* Makes the dashboard scrollable if content exceeds its height */
+      /* Adjust padding, margin, or other styles as needed */
+    }
+  </style>
   <button on:click="{() => showForm = !showForm}">Add Event</button>
-  
-{#if showForm}
+    
+  {#if showForm}
+  <div class="event-form">
     <div>
-        <input type="text" bind:value="{newEvent.title}" placeholder="Event Title" />
-        {#each daysOfWeek as day, index}
-            <input type="checkbox" bind:group="{newEvent.days}" value="{index}"> {day}
-        {/each}
-        <select bind:value="{newEvent.start}">
-        {#each timeOptions as option}
-          <option value="{option}">{option}</option>
-        {/each}
-        </select>
-        <select bind:value="{newEvent.end}">
-        {#each timeOptions as option}
-          <option value="{option}">{option}</option>
-        {/each}
-        </select>
-        <button on:click="{addEvent}">Submit</button>
+      <label for="eventTitle">Event Title</label>
+      <input id="eventTitle" type="text" bind:value="{newEvent.title}" placeholder="Event Title" />
     </div>
-  {/if}
-  
-  <div id="my-calendar"></div>
+    <div class="days-of-week">
+      {#each daysOfWeek as day, index}
+        <div class="checkbox-group">
+          <input type="checkbox" id="day{index}" bind:group="{newEvent.days}" value="{index}">
+          <label for="day{index}">{day}</label>
+        </div>
+      {/each}
+    </div>
+    <div class="time-selectors">
+      <div>
+        <label for="startTime">Start Time</label>
+        <select id="startTime" bind:value="{newEvent.start}">
+          {#each timeOptions as option}
+            <option value="{option}">{option}</option>
+          {/each}
+        </select>
+      </div>
+      <div>
+        <label for="endTime">End Time</label>
+        <select id="endTime" bind:value="{newEvent.end}">
+          {#each timeOptions as option}
+            <option value="{option}">{option}</option>
+          {/each}
+        </select>
+      </div>
+    </div>
+    <button on:click="{addEvent}">Submit</button>
+  </div>
+{/if}
+
+  <div class="grid-container">
+    <div id="my-calendar">
+      <!-- Calendar content goes here -->
+    </div>
+
+    <div class="dashboard">
+      <h2>Dashboard</h2>
+      <!-- Dashboard content -->
+      <p>Event stats, upcoming events, etc.</p>
+    </div>
+  </div>
+    
+
   
