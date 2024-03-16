@@ -1,11 +1,8 @@
 <script>
     import App from "../components/App.svelte";
-    // import Calendar from "../components/Calendar.svelte";
 </script>
 
-<App />
-<!-- <Calendar/>  -->
-
+<App/>
 <!-- <main> 
 <h1> Write Up </h1>
 

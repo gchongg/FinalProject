@@ -8,7 +8,7 @@
 
     let data = [];
     let value;
-    const steps = ["Study Hour and Academic Performance", 'Average Grades vs. Class Size', "Create Schedule"];
+    const steps = ["Study Hour and Academic Performance", 'Average Grades vs. Class Size', "Create Your Own Course Schedule"];
 
     onMount(async () => {
         data = await d3.csv('/capes_dsc_clean_v1.csv', d3.autoType);
@@ -51,8 +51,9 @@
                         </p>
                     </body>
                 {/if}
-                {#if (step === 'Create Schedule')}
-                    <!-- <Calendar></Calendar> -->
+                {#if (step === 'Create Your Own Course Schedule')}
+                    <Calendar></Calendar>
+
                 {/if}
             </div>
         </div>
@@ -60,7 +61,6 @@
     </Scrolly>
     <div class="spacer"></div>
 </section>
-<Calendar></Calendar>
 
 <style>
     /* Global Styles */
@@ -91,17 +91,6 @@
         color: #333;
     }
 
-    /* mark {
-        background-color: #84fab0;
-        color: #333;
-        padding: 0.5em;
-        border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        display: inline-block;
-        margin-top: 1em;
-    } */
-
-    /* Section and Steps */
     section {
         padding: 2em 0;
     }
@@ -115,18 +104,19 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        height: auto; /* Adjusted for content */
+        min-height: auto; /* Adjusted to automatically accommodate content */
         padding: 40px;
         background: #fff;
         margin: 1em auto;
         text-align: center;
         box-shadow: 0 6px 12px rgba(0,0,0,0.1);
         border-radius: 8px;
-        max-width: 800px;
+        max-width: 1400px;
         transition: all 0.3s ease;
         position: relative;
-        overflow: hidden; /* Ensure no content spills out */
+        overflow: visible; /* Consider changing if content is still cut off */
     }
+
 
     .instruction { 
         color: purple;
