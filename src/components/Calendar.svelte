@@ -11,10 +11,16 @@
     end: '',
     title: ''
   };
+
   let departments = [];
   let courses = [];
   let selectedDept = '';
   let selectedCourse = '';
+
+  let courseList = [];
+  let totalLectureDuration = 0; // Total time in minutes
+  let totalStudyHours = 0;
+  let expectedStudyHours = ''; // Expected study hours for the current course
 
   const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const timeOptions = generateTimeOptions();
@@ -29,12 +35,25 @@
   }
 
   function getRandomColor() {
-    const letters = '0123456789ABCDEF';
+    // Define a maximum value for RGB components to avoid colors too close to white.
+    // Setting this to a value like 200 makes sure the colors are distinguishable from white.
+    const maxRGBValue = 200;
     let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
+    for (let i = 0; i < 3; i++) { // There are 3 components: R, G, B
+        // Generate a value from 0 to maxRGBValue for each component.
+        const component = Math.floor(Math.random() * (maxRGBValue + 1)).toString(16);
+        color += component.padStart(2, '0');
     }
     return color;
+}
+
+  let currentColorIndex = 0;
+  const colorScheme = d3.schemeCategory10; // This is an array of color strings
+
+  function getNextColor() {
+      const color = colorScheme[currentColorIndex];
+      currentColorIndex = (currentColorIndex + 1) % colorScheme.length; // Loop back to start when reaching the end
+      return color;
   }
 
   function uniqueCoursesForDept(dept) {
@@ -50,28 +69,73 @@
     });
     showForm = false;
     drawEvents();
+
+    newEvent = { days: [], start: '', end: '', title: '' };
   }
 
   function addCourseEvent() {
-    const courseTitle = courses.find(course => course.courseName === selectedCourse)?.courseName || 'Unnamed Course';
-    const eventColor = getRandomColor(); // Generate a color for this course
 
-    // Iterate over each selected day to create a separate event for each, using the same color
+    const courseTitle = courses.find(course => course.courseName === selectedCourse)?.courseName || 'Unnamed Course';
+    const eventColor = getNextColor(); // Generate a color for this course
+    // Assuming courseData is already defined as the data for the selected course...
+    const courseData = courses.find(course => course.courseName === selectedCourse);
+
+    // Check if the course is already in the list to avoid duplicates
+    const existingCourse = courseList.find(course => course.title === courseData.courseName);
+    if (!existingCourse) {
+        courseList = [
+            ...courseList,
+            { title: courseData.courseName, expectedHours: courseData.expectedHours }
+        ];
+    }
+
+    let dailyTimeCommitment = 0;
+
+    expectedStudyHours = courseData && !isNaN(courseData.expectedHours) ? parseFloat(courseData.expectedHours) : 0;
+
+    totalStudyHours += expectedStudyHours;
+
     newEvent.days.forEach(dayIndex => {
+        const startTimeParts = newEvent.start.split(':').map(Number);
+        const endTimeParts = newEvent.end.split(':').map(Number);
+        const startTimeMinutes = startTimeParts[0] * 60 + startTimeParts[1];
+        const endTimeMinutes = endTimeParts[0] * 60 + endTimeParts[1];
+        const timeDifference = endTimeMinutes - startTimeMinutes;
+
+        dailyTimeCommitment += timeDifference; // Add time difference for this day to the daily time commitment
+
         const courseEvent = {
-            title: courseTitle, // Use the course name as the title
-            day: dayIndex, // Use the index of the day for the event
-            start: newEvent.start, // Use the selected start time
-            end: newEvent.end, // Use the selected end time
-            color: eventColor, // Use the generated color for this course
+            title: courseTitle,
+            day: dayIndex,
+            start: newEvent.start,
+            end: newEvent.end,
+            color: eventColor,
         };
         events.push(courseEvent);
     });
 
+    totalLectureDuration += dailyTimeCommitment; // Update the total time commitment with this course's commitment
+
     showForm2 = false; // Hide the course form after adding the event(s)
     drawEvents(); // Redraw the calendar with the new events
+
+    // Update dashboard with expected study hours for this course
+
+
+    // Update dashboard with total time commitment
+    updatetotalLectureDurationDisplay();
+
+    // Reset form fields for courses
+    newEvent = { days: [], start: '', end: '', title: '' };
+    selectedDept = departments.length > 0 ? departments[0] : '';
+    selectedCourse = ''; // Reset selected course
 }
 
+  function updatetotalLectureDurationDisplay() {
+      const hours = Math.floor(totalLectureDuration / 60);
+      const minutes = totalLectureDuration % 60;
+      document.getElementById('totalLectureDurationDisplay').textContent = `Total Time Commitment: ${hours} hours and ${minutes} minutes`;
+  }
 
 
 
@@ -83,7 +147,7 @@
 
     const deptSet = new Set(data.map(row => row.dept));
     departments = Array.from(deptSet);
-    selectedDept = departments[0];
+    selectedDept = "";
 
     courses = data.map(row => ({
       dept: row.dept,
@@ -238,6 +302,52 @@
     padding: 20px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
   }
+  .dashboard {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: auto;
+  }
+
+  .dashboard h2 {
+    color: #333;
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+
+  .dashboard ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .dashboard ul li {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+  }
+
+  .dashboard ul li:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .course-title {
+    font-weight: bold;
+  }
+
+  .expected-hours {
+    color: #666;
+    font-style: italic;
+  }
 </style>
 
 <button on:click="{() => { showForm = !showForm; showForm2 = false; }}">Add Event</button>
@@ -340,9 +450,33 @@
 {/if}
 
 <div class="dashboard-container">
+
   <div id="my-calendar"></div>
+
   <div id="event-visualizations">
     <h1>Dashboard</h1>
     <!-- Visualization content goes here -->
+    <!-- Display for expected study hours -->
+    <div>Expected Study Hours: {expectedStudyHours}</div>
+    <!-- Display for total time commitment -->
+
+    <div>Total Time Commitment: {Math.floor(totalLectureDuration / 60)} hours and {totalLectureDuration % 60} minutes</div>
+
+    <div>Expected Study Hours: {totalStudyHours}</div>
+
+    <div class="dashboard">
+      <h2> Enrolled Courses</h2>
+      {#if courseList.length > 0}
+          <ul>
+              {#each courseList as { title, expectedHours }}
+                  <li>
+                      <span class="course-title">{title}</span>
+                      <span class="expected-hours">Expected Study Hours: {expectedHours}</span>
+                  </li>
+              {/each}
+          </ul>
+      {/if}
   </div>
+ </div> 
+ 
 </div>
