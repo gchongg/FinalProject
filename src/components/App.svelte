@@ -52,15 +52,15 @@
                     </body>
                 {/if}
                 {#if (step === 'Create Schedule')}
-                    <Calendar></Calendar>
+                    <!-- <Calendar></Calendar> -->
                 {/if}
             </div>
         </div>
         {/each}
     </Scrolly>
-    
     <div class="spacer"></div>
 </section>
+<Calendar></Calendar>
 
 <style>
     /* Global Styles */

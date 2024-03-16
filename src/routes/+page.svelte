@@ -1,16 +1,16 @@
 <script>
-    // import App from "../components/App.svelte";
-    import Calendar from "../components/Calendar.svelte";
+    import App from "../components/App.svelte";
+    // import Calendar from "../components/Calendar.svelte";
 </script>
 
-<!-- <App /> -->
-<Calendar/> 
+<App />
+<!-- <Calendar/>  -->
 
 <!-- <main> 
 <h1> Write Up </h1>
 
 <h3> What have you done so far?  </h3>
-
+å
 <p>We are working with the CAPEs dataset. We have taken the necessary steps to clean the data and performed exploratory data analysis to identify both obvious and non-obvious trends that we believe are important to include in our explorable explanation. To provide more specific insights into the trends, we have filtered the dataset to only include Data Science courses. Our first interactive visualization compares weekly study hours to average grades received and includes a hover option for course details. We are currently working on enhancing the visualization frame with filter boxes for selected courses and axis choices.</p> 
 
 <h3> What will be the most challenging of your project to design and why? </h3>
