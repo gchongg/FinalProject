@@ -1,8 +1,7 @@
 <script>
 import * as d3 from 'd3';
-import {
-    onMount
-} from 'svelte';
+import { onMount } from 'svelte';
+import Svelecte from 'svelecte';
 
 let events = [];
 let showForm = false;
@@ -17,24 +16,40 @@ let newEvent = {
 let departments = [];
 let courses = [];
 let selectedDept = '';
+$: formattedDepartments = departments.map(dept => ({
+    value: dept,
+    text: dept
+}));
+$: formattedCourses = selectedDept ?
+    uniqueCoursesForDept(selectedDept).map(({
+        courseName
+    }) => ({
+        value: courseName,
+        text: courseName
+    })) :
+    [];
+$: selectedDept, formattedCourses = selectedDept ?
+    uniqueCoursesForDept(selectedDept).map(({
+        courseName
+    }) => ({
+        value: courseName,
+        text: courseName
+    })) :
+    [];
+
+// Reset selectedCourse whenever selectedDept changes
+$: if (selectedDept) selectedCourse = '';
+
 let selectedCourse = '';
 
 let courseList = [];
 let totalLectureDuration = 0; // Total time in minutes
 let totalStudyHours = 0;
-let expectedStudyHours = ''; // Expected study hours for the current course
+let expectedStudyHours = 0; // Expected study hours for the current course
 
-const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const timeOptions = generateTimeOptions();
-
-function generateTimeOptions() {
-    const options = [];
-    for (let i = 0; i <= 24; i++) {
-        options.push(`${i.toString().padStart(2, '0')}:00`);
-        if (i < 24) options.push(`${i.toString().padStart(2, '0')}:30`);
-    }
-    return options;
-}
+const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+let selectedStartTime = '';
+let selectedEndTime = '';
 
 function getRandomColor() {
     // Define a maximum value for RGB components to avoid colors too close to white.
@@ -68,100 +83,105 @@ function uniqueCoursesForDept(dept) {
 }
 
 function addEvent() {
+    if (!newEvent.title.trim()) {
+        alert('Please enter a title for the event.');
+        return;
+    }
+
+    if (!selectedStartTime || !selectedEndTime) {
+        alert('Please specify both start and end times.');
+        return;
+    }
+
+    if (newEvent.days.length === 0) {
+        alert('Please select at least one day.');
+        return;
+    }
+
     const color = getRandomColor();
     newEvent.days.forEach(day => {
         events.push({
             ...newEvent,
             day,
-            color
+            color,
+            start: selectedStartTime, // Assuming you'll use selectedStartTime/EndTime for this too
+            end: selectedEndTime,
         });
     });
+
     showForm = false;
     drawEvents();
 
-    newEvent = {
-        days: [],
-        start: '',
-        end: '',
-        title: ''
-    };
+    newEvent = { days: [], start: '', end: '', title: '' };
+    selectedStartTime = '';
+    selectedEndTime = '';
 }
-function clearSchedule() {
-        events = []; // Clear the events array
-        courseList = [];
-        drawEvents()// If you have a function to redraw the calendar, call it here to update the view
-    }
 
+
+function clearSchedule() {
+    events = []; // Clear the events array
+    courseList = [];
+    totalLectureDuration = 0; // Total time in minutes
+    totalStudyHours = 0;
+    expectedStudyHours = '';
+    drawEvents() // If you have a function to redraw the calendar, call it here to update the view
+}
 
 function addCourseEvent() {
-
-    const courseTitle = courses.find(course => course.courseName === selectedCourse)?.courseName || 'Unnamed Course';
-    const eventColor = getNextColor(); // Generate a color for this course
-    // Assuming courseData is already defined as the data for the selected course...
-    const courseData = courses.find(course => course.courseName === selectedCourse);
-
-    // Check if the course is already in the list to avoid duplicates
-    const existingCourse = courseList.find(course => course.title === courseData.courseName);
-    if (!existingCourse) {
-        courseList = [
-            ...courseList,
-            {
-                title: courseData.courseName,
-                expectedHours: courseData.expectedHours
-            }
-        ];
+    if (!selectedCourse || selectedCourse === '') {
+        alert('Please select a course name.');
+        return;
     }
 
+    if (!selectedStartTime || !selectedEndTime) {
+        alert('Please specify both start and end times.');
+        return;
+    }
+
+    if (newEvent.days.length === 0) {
+        alert('Please select at least one day for the course.');
+        return;
+    }
+
+    const courseTitle = courses.find(course => course.courseName === selectedCourse)?.courseName;
+    if (!courseTitle) {
+        alert('Selected course is invalid.');
+        return;
+    }
+
+    const eventColor = getNextColor();
     let dailyTimeCommitment = 0;
 
-    expectedStudyHours = courseData && !isNaN(courseData.expectedHours) ? parseFloat(courseData.expectedHours) : 0;
-
-    totalStudyHours += expectedStudyHours;
-
     newEvent.days.forEach(dayIndex => {
-        const startTimeParts = newEvent.start.split(':').map(Number);
-        const endTimeParts = newEvent.end.split(':').map(Number);
-        const startTimeMinutes = startTimeParts[0] * 60 + startTimeParts[1];
-        const endTimeMinutes = endTimeParts[0] * 60 + endTimeParts[1];
-        const timeDifference = endTimeMinutes - startTimeMinutes;
+        const startTimeParts = selectedStartTime.split(':').map(Number);
+        const endTimeParts = selectedEndTime.split(':').map(Number);
+        const timeDifference = (endTimeParts[0] * 60 + endTimeParts[1]) - (startTimeParts[0] * 60 + startTimeParts[1]);
 
-        dailyTimeCommitment += timeDifference; // Add time difference for this day to the daily time commitment
+        dailyTimeCommitment += timeDifference;
 
-        const courseEvent = {
+        events.push({
             title: courseTitle,
             day: dayIndex,
-            start: newEvent.start,
-            end: newEvent.end,
+            start: selectedStartTime,
+            end: selectedEndTime,
             color: eventColor,
-        };
-        events.push(courseEvent);
+        });
     });
 
-    totalLectureDuration += dailyTimeCommitment; // Update the total time commitment with this course's commitment
+    totalLectureDuration += dailyTimeCommitment;
+    const courseData = courses.find(course => course.courseName === selectedCourse);
+    courseList = [...courseList, { title: courseTitle, expectedHours: courseData.expectedHours }];
+    totalStudyHours += parseFloat(courseData.expectedHours);
 
-    showForm2 = false; // Hide the course form after adding the event(s)
-    drawEvents(); // Redraw the calendar with the new events
+    drawEvents(); // Assuming this updates your calendar view
 
-    // Update dashboard with expected study hours for this course
-
-    // Update dashboard with total time commitment
-    updatetotalLectureDurationDisplay();
-
-    // Reset form fields for courses
-    newEvent = {
-        days: [],
-        start: '',
-        end: '',
-        title: ''
-    };
-    selectedDept = departments.length > 0 ? departments[0] : '';
-    selectedCourse = ''; // Reset selected course
-}
-
-function updatetotalLectureDurationDisplay() {
-    const hours = Math.floor(totalLectureDuration / 60);
-    const minutes = totalLectureDuration % 60;
-    document.getElementById('totalLectureDurationDisplay').textContent = `Total Time Commitment: ${hours} hours and ${minutes} minutes`;
+    showForm2 = false;
+    newEvent = { days: [], start: '', end: '', title: '' };
+    selectedDept = '';
+    selectedStartTime = '';
+    selectedEndTime = '';
+    // To trigger Svelte's reactivity, reassign courseList even if it's logically the same
+    courseList = courseList.slice();
 }
 
 onMount(async () => {
@@ -252,11 +272,10 @@ function timeToPosition(time) {
 <div class="main-container">
     <div class="left-view">
         <div class="dashboard-content">
-            <h1> Time Commitments</h1>
+            <h1> Expected Weekly Time Commitments</h1>
             <div class="dashboard-section">
-                <p>Expected Study Hours: {expectedStudyHours}</p>
-                <p>Total Lecture Hours: {Math.floor(totalLectureDuration / 60)} hours and {totalLectureDuration % 60} minutes</p>
-                <p>Total Expected Study Hours: {totalStudyHours}</p>
+                <p align="left" >Expected Lecture Hours: &nbsp;{Math.floor(totalLectureDuration / 60)} hours and {totalLectureDuration % 60} minutes</p>
+                <p align="left">Expected Study Hours: &nbsp;&nbsp;&nbsp; {totalStudyHours} hours</p>
             </div>
             <div class="dashboard-section courses-list">
                 <h2>Enrolled Courses</h2>
@@ -281,22 +300,12 @@ function timeToPosition(time) {
         <div class="event-form">
             <div>
                 <label for="deptSelect">Department</label>
-                <select id="deptSelect" bind:value="{selectedDept}">
-                    {#each departments as dept}
-                    <option value="{dept}">{dept}</option>
-                    {/each}
-                </select>
+                <Svelecte bind:value="{selectedDept}" options="{formattedDepartments}" placeholder="Select a Department" />
             </div>
 
             <div>
-                <label for="courseSelect">Course Name (Optional)</label>
-                <select id="courseSelect" bind:value="{selectedCourse}">
-                    {#if selectedDept}
-                    {#each uniqueCoursesForDept(selectedDept) as { courseName }}
-                    <option value="{courseName}">{courseName}</option>
-                    {/each}
-                    {/if}
-                </select>
+                <label for="courseSvelecte">Course Name</label>
+                <Svelecte bind:value="{selectedCourse}" options="{formattedCourses}" placeholder="Select a course" />
             </div>
 
             <div class="days-of-week">
@@ -308,24 +317,12 @@ function timeToPosition(time) {
                 {/each}
             </div>
 
-            <div class="time-selectors">
-                <div>
-                    <label for="startTime">Start Time</label>
-                    <select id="startTime" bind:value="{newEvent.start}">
-                        {#each timeOptions as option}
-                        <option value="{option}">{option}</option>
-                        {/each}
-                    </select>
-                </div>
+            <div class="time-inputs">
+                <label for="startTimeInput">Start Time:</label>
+                <input id="startTimeInput" type="time" bind:value="{selectedStartTime}" placeholder="HH:MM">
 
-                <div>
-                    <label for="endTime">End Time</label>
-                    <select id="endTime" bind:value="{newEvent.end}">
-                        {#each timeOptions as option}
-                        <option value="{option}">{option}</option>
-                        {/each}
-                    </select>
-                </div>
+                <label for="endTimeInput">End Time:</label>
+                <input id="endTimeInput" type="time" bind:value="{selectedEndTime}" placeholder="HH:MM">
             </div>
 
             <button on:click="{addCourseEvent}">Submit</button>
@@ -335,7 +332,7 @@ function timeToPosition(time) {
         <div class="event-form">
             <div>
                 <label for="Title">Title</label>
-                <input id="eventTitle" type="text" bind:value="{newEvent.title}" placeholder="Event Title" />
+                <input id="eventTitle" type="text" bind:value="{newEvent.title}" placeholder="Input Event Title" />
             </div>
 
             <div class="days-of-week">
@@ -347,24 +344,12 @@ function timeToPosition(time) {
                 {/each}
             </div>
 
-            <div class="time-selectors">
-                <div>
-                    <label for="startTime">Start Time</label>
-                    <select id="startTime" bind:value="{newEvent.start}">
-                        {#each timeOptions as option}
-                        <option value="{option}">{option}</option>
-                        {/each}
-                    </select>
-                </div>
+            <div class="time-inputs">
+                <label for="startTimeInput">Start Time:</label>
+                <input id="startTimeInput" type="time" bind:value="{selectedStartTime}" placeholder="HH:MM">
 
-                <div>
-                    <label for="endTime">End Time</label>
-                    <select id="endTime" bind:value="{newEvent.end}">
-                        {#each timeOptions as option}
-                        <option value="{option}">{option}</option>
-                        {/each}
-                    </select>
-                </div>
+                <label for="endTimeInput">End Time:</label>
+                <input id="endTimeInput" type="time" bind:value="{selectedEndTime}" placeholder="HH:MM">
             </div>
 
             <button on:click="{addEvent}">Submit</button>
@@ -372,8 +357,8 @@ function timeToPosition(time) {
         {/if}
 
     </div>
+
     <div class="calendar-container" id="my-calendar">
-        <!-- Calendar will be dynamically generated here -->
     </div>
 </div>
 
@@ -394,7 +379,7 @@ function timeToPosition(time) {
 .controls-container {
     grid-area: controls;
     padding: 20px
-    /* Style as needed */
+        /* Style as needed */
 }
 
 .dashboard-content {
@@ -493,12 +478,6 @@ button:focus {
 }
 
 .event-form input[type="text"],
-.event-form select {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: 100%;
-}
 
 .event-form button {
     background-color: #007bff;
