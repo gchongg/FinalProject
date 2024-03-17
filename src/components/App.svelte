@@ -7,10 +7,11 @@ import Scrolly from "./Scrolly.svelte";
 import Scatterplot from "./scatterplot.svelte";
 import Bubbleplot from './bubbleplot.svelte';
 import Calendar from './Calendar.svelte';
+import Histogram from './Histogram.svelte';
 
 let data = [];
 let value;
-const steps = ["Study Hour and Academic Performance", 'Average Grades vs. Class Size', "Create Your Own Course Schedule", "Takeaway"];
+const steps = ["Study Hour and Academic Performance", 'Average Grades vs. Class Size', "View Course Distribution" ,"Create Your Own Course Schedule", "Takeaway"];
 
 onMount(async () => {
     data = await d3.csv('/capes_dsc_clean_v1.csv', d3.autoType);
@@ -74,12 +75,16 @@ onMount(async () => {
                 </p>
                 {/if}
             
-               
+
+                {#if (step === 'View Course Distribution')}
+                    <Histogram></Histogram>
+                {/if}
+
 
                 {#if (step === 'Create Your Own Course Schedule')}
                 <Calendar></Calendar>
-
                 {/if}
+
 
                 {#if (step === 'Takeaway')}
                     <body>
