@@ -100,21 +100,21 @@ function renderHistograms() {
 
         svg.selectAll("*").remove(); // Clear previous histogram
 
+        // Adding X-axis title
         // Custom thresholds for specific histograms
         let thresholds;
         if (col === 'AverageGradeReceived') {
             thresholds = d3.range(0, 4.3, .33333); // Adjusted example range for grades
         } else if (col === 'PercentageRecommendedClass') {
             thresholds = d3.range(0, 105, 10); // Adjusted example range for percentages
-        } else if (col === 'StudyHoursperWeek'){
-            thresholds = d3.range(0, d3.max(data)+1, 2); // Generic range for other columns
-        }
-        else{ 
+        } else if (col === 'StudyHoursperWeek') {
+            thresholds = d3.range(0, d3.max(data) + 1, 2); // Generic range for other columns
+        } else {
             thresholds = d3.range(0, d3.max(data) + 1, 20)
         }
 
         const x = d3.scaleLinear()
-            .domain([0, d3.max(data) + d3.max(data)/4])
+            .domain([0, d3.max(data) + d3.max(data) / 4])
             .range([0, width]);
 
         const histogram = d3.histogram()
@@ -134,6 +134,26 @@ function renderHistograms() {
             .selectAll("text")
             .attr("transform", "translate(-10,0)rotate(-45)")
             .style("text-anchor", "end");
+
+        svg.append("text")
+            .attr("text-anchor", "middle")
+            .attr("x", width / 2 + margin.left)
+            .attr("y", height + margin.top + 40) // Adjust this value to move the title further down from the X-axis
+            .style("font-size", "12px")
+            .text(col);
+
+
+        // Adding Y-axis title
+        svg.append("text")
+            .attr("text-anchor", "middle")
+            .attr("transform", "rotate(-90)") // Rotate the text for vertical orientation
+            .attr("y", -margin.left +10) // Adjust these values to position the Y-axis title correctly
+            .attr("x", -height / 2 + margin.top -30)
+            .style("font-size", "12px")
+            .text("Frequency");
+
+
+
 
         svg.append("g")
             .call(d3.axisLeft(y));
