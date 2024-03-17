@@ -186,7 +186,7 @@ function addCourseEvent() {
 
 onMount(async () => {
     drawCalendar();
-    const response = await fetch('./capes.csv');
+    const response = await fetch('./capes_grouped.csv');
     const csvText = await response.text();
     const data = d3.csvParse(csvText);
 
@@ -478,6 +478,12 @@ button:focus {
 }
 
 .event-form input[type="text"],
+.event-form select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+}
 
 .event-form button {
     background-color: #007bff;

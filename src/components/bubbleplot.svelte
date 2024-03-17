@@ -4,8 +4,8 @@
 
     // set the dimensions and margins of the graph
     export let margin = { top: 60, right: 60, bottom: 60, left: 60 };
-    export let width = 600 - margin.left - margin.right;
-    export let height = 400 - margin.top - margin.bottom;
+    export let width = 700 - margin.left - margin.right;
+    export let height = 500 - margin.top - margin.bottom;
 
     let selectedCourse = 'All Courses';
         
@@ -144,14 +144,18 @@
             .attr("cy", function (d) { return y(parseFloat(d['AverageGradeReceived'])); } )
             .attr("r", function (d) { 
                 return z(parseFloat(d.StudyHoursperWeek)); } )
-            //.attr("r", 5)
-            .style("fill", function (d) {
-                return myColor(d.CourseID); } )
-            // -3- Trigger the functions
+.style("fill", function(d) { 
+                let courseNumber = parseInt(d.CourseID.replace("DSC", "").trim());
+                if (courseNumber >= 100) {
+                    return "blue"; // Color for upper division courses
+                } else {
+                    return "red"; // Color for lower division courses
+                }
+            })
+            .attr("opacity", 0.7)
             .on("mouseover", showTooltip )
             .on("mousemove", moveTooltip )
             .on("mouseleave", hideTooltip )
-
         }
         
 

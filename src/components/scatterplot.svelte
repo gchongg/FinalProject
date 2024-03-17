@@ -3,8 +3,8 @@
     import { onMount } from 'svelte';
     
     export let margin = { top: 60, right: 60, bottom: 60, left: 60 };
-    export let width = 600 - margin.left - margin.right;
-    export let height = 400 - margin.top - margin.bottom;
+    export let width = 700 - margin.left - margin.right;
+    export let height = 500 - margin.top - margin.bottom;
 
     let xAxisColumn = 'StudyHoursperWeek'; // Default x-axis column
     let yAxisColumn = 'AverageGradeReceived'; // Default y-axis column
@@ -47,7 +47,7 @@
 
         // Add Y axis
         var y = d3.scaleLinear()
-            .domain([0, 4])
+            .domain([2, 4])
             .range([ height, 0]);
         svg.append("g")
             .call(d3.axisLeft(y));

@@ -1,8 +1,10 @@
 <script>
     import App from "../components/App.svelte";
+    // import Histogram from "../components/Histogram.svelte";
 </script>
 
 <App/>
+<!-- <Histogram/> -->
 <!-- <main> 
 <h1> Write Up </h1>
 
